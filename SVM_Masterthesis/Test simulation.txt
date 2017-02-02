@@ -1,0 +1,240 @@
+/* Test simulation */
+	problem.l = 4; //4 data rows in a certain model
+
+	/* Generating data rows */
+	double matrix[4][2]; //creating a matrix containing all values of the data (rows and columns) for the x value of the problem
+	matrix[0][0] = 0; //matrix[row][column]
+	matrix[0][1] = 1;
+
+	matrix[1][0] = 1;
+	matrix[1][1] = 0;
+
+	matrix[2][0] = 1;
+	matrix[2][1] = 0;
+	
+	matrix[3][0] = 1;
+	matrix[3][1] = 0;
+	
+	/*
+	matrix[4][0] = 1;
+	matrix[4][1] = 1; */
+
+	/* Insert data values into x value of problem */
+	svm_node **x = Malloc(svm_node*, problem.l);
+
+	for (int row = 0; row < problem.l; row++)
+	{
+		svm_node * x_space = Malloc(svm_node, 3);
+		for (int col = 0; col < 2; col++)
+		{
+			x_space[col].index = col;
+			x_space[col].value = matrix[row][col];
+		}
+		x_space[2].index = -1;
+		x[row] = x_space;
+	}
+	problem.x = x;
+
+	/* Generate corresponding labels */
+	problem.y = Malloc(double, problem.l); //Classification for the number of training data
+	problem.y[0] = -1;
+	problem.y[1] = 1;
+	problem.y[2] = 1;
+	problem.y[3] = -1;
+
+	/*
+	Test of all parameters were correctly initialized
+	svm_check_parameter return NULL when everything is correctly initialized
+	a check on wether or not this function returns NULL prevents unwanted break from program
+	*/
+	if (svm_check_parameter(&problem, &param) != NULL)
+	{
+		cout << svm_check_parameter(&problem, &param) << endl;
+	}
+
+	//Creating data that will be predicted according to the training
+	svm_node *testnode = Malloc(svm_node, 3); 
+	testnode[0].index = 0;
+	testnode[0].value = 1;
+	testnode[1].index = 1;
+	testnode[1].value = 0;
+	testnode[2].index = -1;
+
+
+	Old code for test Node
+***************************************************************************
+	svm_node **testNode = Malloc(svm_node*, testRows);
+	indexCounter = 0;
+	valueCounter = 0;
+	int testColumns = ceil(indexTestNodes.size() / testRows);
+	for (int row = 0; row < testRows; row++)
+	{
+		svm_node * testNode_space = Malloc(svm_node, numberOfColumns);
+		for (int col = 0; col < testColumns; col++)
+		{
+			testNode_space[col].index = indexTestNodes[indexCounter];
+			if (indexNodes[indexCounter] != -1)
+			{
+				testNode_space[col].value = valueTestNodes[valueCounter];
+				valueCounter++;
+			}
+			indexCounter++;
+			//cout << "node column: " << nodeColumn << endl;
+		}
+		testNode[row] = testNode_space;
+	}
+	***************************************************************************
+	//create training data
+	svm_node *testNode = Malloc(svm_node, 16);
+	int i = 0;
+
+	testNode[0].index = 5;
+	testNode[0].value = 1;
+	testNode[1].index = 7;
+	testNode[1].value = 1;
+	testNode[2].index = 17;
+	testNode[2].value = 1;
+	testNode[3].index = 22;
+	testNode[3].value = 1;
+	testNode[4].index = 36;
+	testNode[4].value = 1;
+	testNode[5].index = 40;
+	testNode[5].value = 1; 	//5:1 7:1 17:1 22:1 36:1 40:1 51:1 63:1 67:1 73:1 74:1 76:1 81:1 83:1 
+	testNode[6].index = 51;
+	testNode[6].value = 1;
+	testNode[7].index = 63;
+	testNode[7].value = 1;
+	testNode[8].index = 67;
+	testNode[8].value = 1;
+	testNode[9].index = 73;
+	testNode[9].value = 1;
+	testNode[10].index = 74;
+	testNode[10].value = 1;
+	testNode[11].index = 76;
+	testNode[11].value = 1;
+	testNode[12].index = 81;
+	testNode[12].value = 1;
+	testNode[13].index = 83;
+	testNode[13].value = 1;
+	testNode[14].index = -1;
+
+	//OLD CODE FOR GOING THROUGH THE VECTORS TO FILL UP THE PROBLEM NODES
+	for (int col = 0; col < numberOfColumns; col++)
+		{
+			x_space[col].index = indexNodes[indexCounter];
+			//cout << "Testing import into problem: Index: " << indexNodes[indexCounter] << " Value: " << valueNodes[valueCounter] << endl;
+			if (indexNodes[indexCounter] != -1)
+			{
+				x_space[col].value = valueNodes[valueCounter];
+				valueCounter++;
+			}
+			indexCounter++;
+			cout << x_space[col].index << " " << x_space[col].value << endl;
+		}
+
+// OLD CODE ON PROCESSING INPUT FILE
+vector<double> yLabels;
+	vector<int> indexNodes;
+	vector<int> valueNodes;
+	int problemLength = 0;
+	//process_file(myfile, yLabels, indexNodes, valueNodes, problemLength);
+	/*if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			problemLength++;
+			//cout << line << '\n';
+			position = 0;
+			for (int i = 0; i < line.length(); i++)
+			{
+				spaceChar = line[i];
+				if (isspace(spaceChar))
+				{
+		
+					//read every part between " " and the next " "
+					lineSubstring = line.substr(position, i - position);
+					if (position == 0) //get all labels
+					{
+						//conversion of 1 or -1 to double
+						y = atof(lineSubstring.c_str());
+						yLabels.push_back(y);
+						//cout << yLabels[0] << endl;
+					}
+					else //get nodes of a certain label
+					{
+						positionSubstring = lineSubstring.find(":");
+						index = stoi(lineSubstring.substr(0, positionSubstring));
+						value = stoi(lineSubstring.substr(positionSubstring + 1, lineSubstring.length()));
+						indexNodes.push_back(index);
+						valueNodes.push_back(value);
+						//cout << index << " " << value << endl;
+					}
+
+					position = i + 1;
+				}
+			}
+			//Indicate end of x node
+			indexNodes.push_back(-1);
+		}
+		myfile.close();
+	}
+	else cout << "Unable to open file" << endl;
+
+	cout << "END" << '\n';
+	*/
+
+	****************************************************** OLD CODE ON READING TEST NODE
+	/*if (myfile2.is_open())
+	{
+		while (getline(myfile2, line))
+		{
+			testRows++;
+			//cout << line << '\n';
+			position = 0;
+			for (int i = 0; i < line.length(); i++)
+			{
+				spaceChar = line[i];
+				if (isspace(spaceChar))
+				{
+
+					//read every part between " " and the next " "
+					lineSubstring = line.substr(position, i - position);
+					if (position == 0) //get all labels
+					{
+						//conversion of 1 or -1 to double
+						y = atof(lineSubstring.c_str());
+					}
+					else //get nodes of a certain label
+					{
+						positionSubstring = lineSubstring.find(":");
+						index = stoi(lineSubstring.substr(0, positionSubstring));
+						value = stoi(lineSubstring.substr(positionSubstring + 1, lineSubstring.length()));
+						indexTestNodes.push_back(index);
+						valueTestNodes.push_back(value);
+						//cout << index << " " << value << endl;
+					}
+
+					position = i + 1;
+				}
+			}
+			//indicate end of node
+			indexTestNodes.push_back(-1);
+			//cout << lineSubstring << endl;
+		}
+		myfile2.close();
+
+	}
+	else cout << "Unable to open file" << endl;*/
+
+
+	************************************************** TESTING COMMANDS
+	//cout << "Test node done! " << problemLength << endl;
+	//cout << testColumns << " " << indexCounter << " " << valueCounter << " " << indexTestNodes.size() << " " << valueTestNodes.size() << endl;
+	//cout << x_space[col].index << " " << x_space[col].value << endl;
+	//cout << "Value of indexcounter: " << indexCounter << endl;
+	//cout << "Problem node test:" << x[row][14].index << endl;
+	//cout << "Problem node test:" << x[1][0].index << endl;
+	//cout << "test problem: Label = " << problem.y[0] << " problem: " << problem.x[0][0].index << " " << problem.x[0][0].value << endl;
+	//cout << testNode_space[col].index << " " << testNode_space[col].value << endl;
+	//cout << "Value of indexcounter: " << indexCounter << endl;
+	//cout << "Problem node test:" << testNode[row][14].index << endl;
