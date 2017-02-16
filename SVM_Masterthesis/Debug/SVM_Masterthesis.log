@@ -1,6 +1,1 @@
-﻿  SVM_Masterthesis.cpp
-d:\master proef\svm_masterthesis\svm_masterthesis\svm_masterthesis.cpp(69): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-d:\master proef\svm_masterthesis\svm_masterthesis\svm_masterthesis.cpp(114): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-d:\master proef\svm_masterthesis\svm_masterthesis\svm_masterthesis.cpp(169): warning C4018: '<': signed/unsigned mismatch
-d:\master proef\svm_masterthesis\svm_masterthesis\svm_masterthesis.cpp(227): warning C4018: '<': signed/unsigned mismatch
-  SVM_Masterthesis.vcxproj -> D:\Master proef\SVM_masterthesis\Debug\SVM_Masterthesis.exe
+﻿  SVM_Masterthesis.vcxproj -> D:\Master_proef\SVM_Masterthesis\Debug\SVM_Masterthesis.exe

@@ -25,6 +25,12 @@
     <Text Include="Test simulation.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="..\..\Data\a1a_old.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\Data\a1a_train_old.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SVM_Masterthesis.cpp">

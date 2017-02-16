@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,8 +12,10 @@
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type)) //easier way to perform a malloc
 using namespace std;
 
-int processTrainingFile(ifstream& myfile, vector<double>& yLabels, vector<int>&indexNodes, vector<int>& valueNodes, int& problemLength);
-int processTestFile(ifstream& myfile2, vector<int>& indexTestNodes, vector<int>& valueTestNodes, int& testRows);
+//Training or testing with labels
+int processFile(ifstream& myfile, vector<double>& yLabels, vector<int>&indexNodes, vector<int>& valueNodes, int& problemLength);
+//Testing without labels
+//int processTestFile(ifstream& myfile2, vector<int>& indexTestNodes, vector<int>& valueTestNodes, int& testRows);
 
 int main()
 {
@@ -22,23 +25,28 @@ int main()
 	vector<int> indexNodes;
 	vector<int> valueNodes;
 	int problemLength = 0;
-	int success = processTrainingFile(myfile, yLabels, indexNodes, valueNodes, problemLength);
+	int success = processFile(myfile, yLabels, indexNodes, valueNodes, problemLength);
 	if (success != 0)
 	{
 		//Processing file failed
 		cout << "Something went wrong with processing the training file!" << endl;
+		cerr << "Error: " << strerror(errno);
+		cin.get();
 		return 1;
 	}
 	//read in test data -----------------------------------------------------------------------
 	ifstream myfile2("a1a.txt");
+	vector<double> yTestLabels;
 	vector<int> indexTestNodes;
 	vector<int> valueTestNodes;
 	int testRows = 0;
-	success = processTestFile(myfile2, indexTestNodes, valueTestNodes, testRows);
+	success = processFile(myfile2, yTestLabels, indexTestNodes, valueTestNodes, testRows);
 	if (success != 0)
 	{
 		//Processing file failed
 		cout << "Something went wrong with processing the test file!" << endl;
+		cerr << "Error: " << strerror(errno);
+		cin.get();
 		return 1;
 	}
 	//-------------------------------------------------------------------------------------------------------------------------------
@@ -61,14 +69,17 @@ int main()
 	param.probability = 0;
 	param.shrinking = 1;
 	//-------------------------------------------------------------------------------------------------------------------------------
-	//Setting up the problem for model
+	//Setting up the problem for model --> Training our data
 	svm_problem problem;
 	problem.l = problemLength;
-	cout << problem.l << endl;
+	cout << "Number of rows for the problem: " << problem.l << endl;
 	int rowProblem = 0;
 	int numberOfColumns = ceil(indexNodes.size() / problem.l);
 
-	cout << "number of column = " << numberOfColumns << " nomber of rows = " << problem.l << endl;
+	cout << "number of column = " << numberOfColumns << " number of rows = " << problem.l << endl;
+	/*
+	Generate the data for our problem on each row of our training data
+	*/
 	svm_node **x = Malloc(svm_node*, problem.l);
 	int indexCounter = 0;
 	int valueCounter = 0;
@@ -90,6 +101,9 @@ int main()
 		x[row] = x_space;
 	}
 	cout << indexCounter << " " << valueCounter << " " << indexNodes.size() << " " << valueNodes.size() << endl;
+	/*
+	Generate the correct labels given to each row
+	*/
 	problem.x = x;
 	problem.y = Malloc(double, problem.l);
 	int labelCount = 0;
@@ -100,13 +114,13 @@ int main()
 	}
 	//Create a model by training a problem and parameter
 	svm_model *model = svm_train(&problem, &param);
-	cout << "Training done! " << problemLength << endl;
+	cout << "Training done! Number of rows in model = " << problemLength << endl;
 	if (svm_check_parameter(&problem, &param) != NULL)
 	{
 		cout << svm_check_parameter(&problem, &param) << endl;
 	}
 	//-------------------------------------------------------------------------------------------------------------------------------
-	//Create test node with values from a1a
+	//Create test node with values from a1a, later on we iterate over this test node to perform our SVM classification
 	svm_node **testNode = Malloc(svm_node*, testRows);
 	indexCounter = 0;
 	valueCounter = 0;
@@ -130,16 +144,42 @@ int main()
 	}
 	//-------------------------------------------------------------------------------------------------------------------------------
 	//retval returns the correct label (Y-value) of the corresponding row that matches the data
-	double retval = svm_predict(model, *testNode); 
+	/*double retval = svm_predict(model, testNode[25]); 
 	cout << "Return value = " << retval << endl;
+	cout << "Value from line 26 on test node: " << testNode[24][0].index << " With label: " << yTestLabels[24] << endl;*/
+	/* 
+	Returning the accuracy of the giving training file with a certain test file
+	Accuracy shows how many Test nodes were accurately predicted towards their given class (supervised learning)
+	*/
+	double accuracy = 0;
+	int totalClassifications = 0;
+	double retval = 0;
+	vector<int> returnValues;
+	for (int row = 0; row < testRows; row++)
+	{
+		retval = svm_predict(model, testNode[row]);
+		returnValues.push_back(retval);
+		if (retval == yTestLabels[row]) ++accuracy;
+		++totalClassifications;
+	}
+	cout << "Return value of prediction = " << retval << endl;
+	cout << "Accuracy = " << accuracy / totalClassifications * 100 << "% (" << accuracy << "/" << totalClassifications << ")" << endl;
 
-	//predict accuracy
-	double *accuracy = Malloc(double, 10);
-	svm_predict_values(model, *testNode, accuracy);
-	*accuracy = *accuracy * 100;
-	cout << "Accuracy = " << *accuracy << "%" << endl;
-
-
+	/*
+	Display what the return value was for a given row on the file
+	*/
+	cout << "Displaying return values for the given training file:" << endl;
+	int returnRow = 1;
+	for (vector<int>::iterator it = returnValues.begin(); it != returnValues.end(); ++it)
+	{
+		cout << "Row " << returnRow << ": " << *it << endl;
+		++returnRow;
+	}
+	
+	std::ofstream output_file("./returnValues.txt");
+	std::ostream_iterator<int> output_iterator(output_file, "\n");
+	std::copy(returnValues.begin(), returnValues.end(), output_iterator);
+	
 	/* DESTROY ALL DATA */
 	svm_destroy_param(&param);
 
@@ -148,7 +188,7 @@ int main()
     return 0;
 }
 
-int processTrainingFile(ifstream& myfile, vector<double>& yLabels, vector<int>&indexNodes, vector<int>& valueNodes, int& problemLength)
+int processFile(ifstream& myfile, vector<double>& yLabels, vector<int>&indexNodes, vector<int>& valueNodes, int& problemLength)
 {
 	string line;
 	string lineSubstring;
@@ -206,7 +246,7 @@ int processTrainingFile(ifstream& myfile, vector<double>& yLabels, vector<int>&i
 
 }
 
-int processTestFile(ifstream& myfile2, vector<int>& indexTestNodes, vector<int>& valueTestNodes, int& testRows)
+/*int processTestFile(ifstream& myfile2, vector<int>& indexTestNodes, vector<int>& valueTestNodes, int& testRows)
 {
 	string line;
 	string lineSubstring;
@@ -260,5 +300,5 @@ int processTestFile(ifstream& myfile2, vector<int>& indexTestNodes, vector<int>&
 		cout << "Unable to open file" << endl;
 		return 1;
 	}
-}
+} */
 

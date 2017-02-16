@@ -146,6 +146,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="..\..\Data\a1a_old.txt" />
+    <Text Include="..\..\Data\a1a_train_old.txt" />
     <Text Include="a1a.txt" />
     <Text Include="a1a_train.txt" />
     <Text Include="ReadMe.txt" />
