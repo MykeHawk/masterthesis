@@ -1,0 +1,107 @@
+ifstream myfile("a1a_train.txt");
+vector<double> yLabels;
+vector<int> indexNodes;
+vector<int> valueNodes;
+int problemLength = 0;
+int success = processFile(myfile, yLabels, indexNodes, valueNodes, problemLength);
+cout << indexNodes[414] << " test from original" << endl;
+//cout << training_file.getValueNodes[0] << " test from datafale" << endl;
+//cout << testing[0] << " testing from datefile" << endl;
+if (success != 0)
+{
+	//Processing file failed
+	cout << "Something went wrong with processing the training file!" << endl;
+	cerr << "Error: " << strerror(errno);
+	cin.get();
+	return 1;
+}
+//read in test data -----------------------------------------------------------------------
+ifstream myfile2("a1a.txt");
+vector<double> yTestLabels;
+vector<int> indexTestNodes;
+vector<int> valueTestNodes;
+int testRows = 0;
+success = processFile(myfile2, yTestLabels, indexTestNodes, valueTestNodes, testRows);
+if (success != 0)
+{
+	//Processing file failed
+	cout << "Something went wrong with processing the test file!" << endl;
+	cerr << "Error: " << strerror(errno);
+	cin.get();
+	return 1;
+}
+
+
+
+//Setting up the problem for model --> Training our data
+svm_problem problem;
+problem.l = problemLength;
+cout << "Number of rows for the problem: " << problem.l << endl;
+int rowProblem = 0;
+int numberOfColumns = ceil(indexNodes.size() / problem.l);
+
+cout << "number of column = " << numberOfColumns << " number of rows = " << problem.l << endl;
+/*
+Generate the data for our problem on each row of our training data
+*/
+svm_node **x = Malloc(svm_node*, problem.l);
+int indexCounter = 0;
+int valueCounter = 0;
+int col = 0;
+for (int row = 0; row < problem.l; row++)
+{
+	svm_node * x_space = Malloc(svm_node, numberOfColumns);
+	while (indexNodes[indexCounter] != -1)
+	{
+		x_space[col].index = indexNodes[indexCounter];
+		x_space[col].value = valueNodes[valueCounter];
+		valueCounter++;
+		indexCounter++;
+		col++;
+	}
+	x_space[col].index = -1;
+	indexCounter++;
+	col = 0;
+	x[row] = x_space;
+}
+cout << indexCounter << " " << valueCounter << " " << indexNodes.size() << " " << valueNodes.size() << endl;
+/*
+Generate the correct labels given to each row
+*/
+problem.x = x;
+problem.y = Malloc(double, problem.l);
+int labelCount = 0;
+for (vector<double>::iterator it = yLabels.begin(); it != yLabels.end(); ++it)
+{
+	problem.y[labelCount] = *it;
+	labelCount++;
+}
+//Create a model by training a problem and parameter
+svm_model *model = svm_train(&problem, &param);
+cout << "Training done! Number of rows in model = " << problemLength << endl;
+if (svm_check_parameter(&problem, &param) != NULL)
+{
+	cout << svm_check_parameter(&problem, &param) << endl;
+}
+
+svm_node **testNode = Malloc(svm_node*, testRows);
+indexCounter = 0;
+valueCounter = 0;
+col = 0;
+int testColumns = ceil(indexTestNodes.size() / testRows);
+for (int row = 0; row < testRows; row++)
+{
+	svm_node * testNode_space = Malloc(svm_node, numberOfColumns);
+	while (indexTestNodes[indexCounter] != -1)
+	{
+		testNode_space[col].index = indexTestNodes[indexCounter];
+		testNode_space[col].value = valueTestNodes[valueCounter];
+		valueCounter++;
+		indexCounter++;
+		col++;
+	}
+	testNode_space[col].index = -1;
+	indexCounter++;
+	col = 0;
+	testNode[row] = testNode_space;
+}
