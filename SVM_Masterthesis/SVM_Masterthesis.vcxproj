@@ -150,15 +150,23 @@
     <Text Include="..\..\Data\a1a_train_old.txt" />
     <Text Include="a1a.txt" />
     <Text Include="a1a_train.txt" />
+    <Text Include="old_code.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="Test simulation.txt" />
+    <Text Include="Text.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Code\libsvm-3.21\svm.cpp" />
+    <ClCompile Include="datafile.cpp" />
+    <ClCompile Include="model.cpp" />
     <ClCompile Include="SVM_Masterthesis.cpp" />
+    <ClCompile Include="trainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="datafile.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="svm.h" />
+    <ClInclude Include="trainer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

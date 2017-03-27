@@ -31,6 +31,12 @@
     <Text Include="..\..\Data\a1a_train_old.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="old_code.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Text.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SVM_Masterthesis.cpp">
@@ -39,9 +45,27 @@
     <ClCompile Include="..\..\Code\libsvm-3.21\svm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="datafile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="svm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="datafile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
