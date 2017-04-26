@@ -14,10 +14,11 @@ public:
 	svm_model* getSvmModel(void);
 	void setSvmModel(svm_model * generated_model);
 	svm_parameter getParameter(void);
+	void setParameter(svm_parameter user_parameter);
 	DataFile getDatafile(void);
 	void setDataFileTrainer(DataFile & trained);
 	/* Functions */
-	int predict(DataFile & testing_data);
+	double predict(DataFile & testing_data);
 
 private:
 	svm_model* model;

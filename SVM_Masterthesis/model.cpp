@@ -4,10 +4,11 @@
 
 Model::Model()
 {
+	/* Default parameters */
 	parameter.svm_type = C_SVC;
 	parameter.kernel_type = RBF;
 	parameter.degree = 3;
-	parameter.gamma = 0; //0.5
+	parameter.gamma = 0.5; //0.5
 	parameter.coef0 = 0;
 	parameter.nu = 0.5;
 	parameter.cache_size = 100;
@@ -36,6 +37,11 @@ svm_parameter Model::getParameter(void)
 	return parameter;
 }
 
+void Model::setParameter(svm_parameter user_parameter)
+{
+	parameter = user_parameter;
+}
+
 DataFile Model::getDatafile(void)
 {
 	return *trained_by;
@@ -46,11 +52,11 @@ void Model::setDataFileTrainer(DataFile & trained)
 	trained_by = &trained;
 }
 
-int Model::predict(DataFile & testing_data)
+double Model::predict(DataFile & testing_data)
 {
 	double calculate_accuracy = 0;
 	double total_classifications = 0;
-	double return_value = 0;
+	int return_value = 0;
 	vector<int> return_values;
 	int test_rows = testing_data.getProblemLength();
 	vector<double> y_test_labels = testing_data.getYlabels();
@@ -62,14 +68,15 @@ int Model::predict(DataFile & testing_data)
 		if (return_value == y_test_labels[row]) ++calculate_accuracy;
 		++total_classifications;
 	}
+	double total_accuracy = calculate_accuracy / total_classifications * 100;
 	cout << "Return value of prediction = " << return_value << endl;
-	cout << "Accuracy = " << calculate_accuracy / total_classifications * 100 << "% (" << calculate_accuracy << "/" << total_classifications << ")" << endl;
+	cout << "Accuracy = " << total_accuracy << "% (" << calculate_accuracy << "/" << total_classifications << ")" << endl;
 
 	std::ofstream output_file("./return_values_class.txt");
 	std::ostream_iterator<int> output_iterator(output_file, "\n");
 	std::copy(return_values.begin(), return_values.end(), output_iterator);
 
-	return return_value;
+	return total_accuracy;
 }
 
 
