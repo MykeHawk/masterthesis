@@ -1,7 +1,5 @@
 #include "model.h"
 
-
-
 Model::Model()
 {
 	/* Default parameters */
@@ -78,6 +76,7 @@ double Model::predict(DataFile & testing_data)
 
 	return total_accuracy;
 }
+
 
 
 Model::~Model()
