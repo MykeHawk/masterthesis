@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="mlpack-windows_init">
+  <PropertyGroup Label="Default initializers for properties">
+    <Linkage-mlpack-windows Condition="'$(Linkage-mlpack-windows)' == ''">dynamic</Linkage-mlpack-windows>
+    <CallingConvention-mlpack-windows Condition="'$(CallingConvention-mlpack-windows)' == ''">cdecl</CallingConvention-mlpack-windows>
+  </PropertyGroup>
+  <ItemDefinitionGroup Label="x64" Condition="'$(Platform.ToLower())' == 'x64'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib/x64\mlpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup Label="x64" Condition="'$(Platform.ToLower())' == 'x64'">
+    <None Include="$(MSBuildThisFileDirectory)../..//build/native/bin/x64/.\mlpack.dll" Condition="(('$(AppContainerApplication.ToLower())' == 'true')) OR (('$(TargetPlatformIdentifier.ToLower())' == 'windows phone' And '$(TargetPlatformVersion)' == '8.0'))">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)\default-propertiesui.xml" />
+  </ItemGroup>
+  <Target Name="mlpack-windows_AfterBuild" AfterTargets="AfterBuild" />
+  <Target Name="mlpack-windows_AfterBuild_x64" Label="x64" Condition="'$(Platform.ToLower())' == 'x64'" AfterTargets="mlpack-windows_AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)../..//build/native/bin/x64/.\mlpack.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
+  </Target>
+  <UsingTask TaskName="mlpack-windows_Contains" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
+    <ParameterGroup>
+      <Text Output="false" ParameterType="System.String" />
+      <Library Output="false" Required="true" ParameterType="System.String" />
+      <Value Output="false" Required="true" ParameterType="System.String" />
+      <Result Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Code>Result = ((Text ?? "").Split(';').Contains(Library) ) ? Value : String.Empty;</Code>
+    </Task>
+  </UsingTask>
+  <Target Name="mlpack-windows_init">
+    <mlpack-windows_Contains Text="Linkage-dynamic" Library="mlpack-windows" Value="dynamic" Condition="'$(Linkage-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="Linkage-static" Library="mlpack-windows" Value="static" Condition="'$(Linkage-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="Linkage-ltcg" Library="mlpack-windows" Value="ltcg" Condition="'$(Linkage-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="Linkage-sxs" Library="mlpack-windows" Value="sxs" Condition="'$(Linkage-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="CallingConvention-cdecl" Library="mlpack-windows" Value="cdecl" Condition="'$(CallingConvention-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="CallingConvention-stdcall" Library="mlpack-windows" Value="stdcall" Condition="'$(CallingConvention-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="CallingConvention-fastcall" Library="mlpack-windows" Value="fastcall" Condition="'$(CallingConvention-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="CallingConvention-thiscall" Library="mlpack-windows" Value="thiscall" Condition="'$(CallingConvention-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-mlpack-windows" />
+    </mlpack-windows_Contains>
+    <mlpack-windows_Contains Text="CallingConvention-clrcall" Library="mlpack-windows" Value="clrcall" Condition="'$(CallingConvention-mlpack-windows)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-mlpack-windows" />
+    </mlpack-windows_Contains>
+  </Target>
+</Project>

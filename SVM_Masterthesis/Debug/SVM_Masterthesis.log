@@ -1,2 +1,4 @@
-﻿  SVM_Masterthesis.cpp
+﻿  trainer.cpp
+d:\master_proef\svm_masterthesis\svm_masterthesis\trainer.cpp(454): warning C4018: '<': signed/unsigned mismatch
+d:\master_proef\svm_masterthesis\svm_masterthesis\trainer.cpp(456): warning C4018: '<': signed/unsigned mismatch
   SVM_Masterthesis.vcxproj -> D:\Master_proef\SVM_Masterthesis\Debug\SVM_Masterthesis.exe
